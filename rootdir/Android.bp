@@ -1,0 +1,27 @@
+//
+// Copyright (C) 2025 The LineageOS Project
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+// Init configuration files
+prebuilt_etc {
+    name: "init.SNxxx.nfc.rc",
+    src: "etc/init.SNxxx.nfc.rc",
+    sub_dir: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.SNxxx.se.rc",
+    src: "etc/init.SNxxx.se.rc",
+    sub_dir: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.penangf.rc",
+    src: "etc/init.penangf.rc",
+    sub_dir: "init/hw",
+    vendor: true,
+}

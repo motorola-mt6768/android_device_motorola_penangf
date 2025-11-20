@@ -1,0 +1,69 @@
+import /vendor/etc/init/hw/init.SNxxx.nfc.rc
+import /vendor/etc/init/hw/init.SNxxx.se.rc
+
+on boot
+    chown system system /sys/vib_duration/vib_dur
+
+on post-fs-data
+    # Fingerprint
+    ##FPC
+    chmod 0660 /dev/fpc1020
+    chown system system /dev/fpc1020
+    chown system system /sys/devices/platform/fpc1020_fp/irq
+    chown system system /sys/devices/platform/fpc1020_fp/wakeup
+    ##EGIS
+    chmod 0666 /dev/esfp0
+    chown system system /dev/esfp0
+    chmod 0666 /sys/devices/platform/egis_input/navigation_event
+    chmod 0666 /sys/devices/platform/egis_input/navigation_enable
+    chown system system /sys/devices/platform/egis_input/navigation_enable
+    chown system system /sys/devices/platform/egis_input/navigation_event
+
+    #Sensor
+    chmod 0666 /sys/devices/platform/11016000.i2c/i2c-5/5-0012/aot_cali
+    chown system system /sys/devices/platform/11016000.i2c/i2c-5/5-0012/aot_cali
+
+on property:vendor.init.camera.mount.data=1
+    mount none /vendor/etc/bstconfig/BSTSWAD_Calib1.bin /vendor/etc/bstconfig/BSTSWAD_Calib.bin bind rec
+on property:vendor.init.camera.mount.data=2
+    mount none /vendor/etc/bstconfig/BSTSWAD_Calib2.bin /vendor/etc/bstconfig/BSTSWAD_Calib.bin bind rec
+
+on property:sys.power.scenario=*
+    start vendor.powersar
+
+service vendor.powersar /vendor/bin/wpa_cli_moto driver SET_PWR_CTRL MySAR ${sys.power.scenario}
+    class main
+    user root
+    group root wifi net_admin net_raw
+    disabled
+    oneshot
+
+on property:sys.power.scenario.ap=5
+    start enable_apsar
+
+on property:sys.power.scenario.ap=0
+    start recovery_apsar
+
+service enable_apsar /vendor/bin/iwpriv_moto ap0 driver "set_pwr_ctrl MySAR 5"
+    class main
+    user wifi
+    group wifi net_raw net_admin
+    disabled
+    oneshot
+
+service recovery_apsar /vendor/bin/iwpriv_moto ap0 driver "set_pwr_ctrl MySAR 0"
+    class main
+    user wifi
+    group wifi net_raw net_admin
+    disabled
+    oneshot
+
+on property:sys.power.scenario.ap=10
+    start set_apsar_ten
+
+service set_apsar_ten /vendor/bin/iwpriv_moto ap0 driver "set_pwr_ctrl MySAR 10"
+    class main
+    user wifi
+    group wifi net_raw net_admin
+    disabled
+    oneshot
